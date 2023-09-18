@@ -1,14 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import SearchIcon from "@mui/icons-material/Search";
+import ReactPaginate from "react-paginate";
 
 const FormProduct = () => {
   const [data, setData] = useState([]);
   const [form, setForm] = useState({});
+  const [query, setQuery] = useState("");
+  const [limit, setLimit] = useState([]);
+  const currentPage = useRef();
+  const usersPerPage = 10;
+  const pageCount = Math.ceil(data.length / usersPerPage);
 
   useEffect(() => {
+    currentPage.current = 1;
+    loadData();
+    getPaginatedUsers();
     loadData();
   }, []);
 
@@ -48,6 +58,26 @@ const FormProduct = () => {
       .catch((err) => console.log(err));
   };
 
+  function handlePageClick(e) {
+    console.log(e);
+    currentPage.current = e.selected + 1;
+    getPaginatedUsers();
+  }
+
+  function getPaginatedUsers() {
+    fetch(
+      `http://localhost:3000/api/product?page=${currentPage.current}&limit=${limit}`,
+      {
+        method: "GET",
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data, "userData");
+        setData(data);
+      });
+  }
+
   return (
     <div>
       <div className="text-center p-8 font-bold text-xl text-gray-900 dark:text-white">
@@ -60,7 +90,7 @@ const FormProduct = () => {
               for="base-input"
               className="block mb-2 text-gray-900 dark:text-white"
             >
-              ยุทธศาสตร์ชาติ
+              เเผนเเม่บทย่อยภายใต้ยุทธศาสตร์ชาติประเด็นการเกษตร
             </label>
 
             <select
@@ -75,25 +105,42 @@ const FormProduct = () => {
               <option selected className="text-blue">
                 กรุณาเลือกตัวชี้วัด
               </option>
-              <option>ดัชนีสันติภาพโลก</option>
-              <option>ดัชนีความสุขโลก</option>
-              <option>ดัชนีสิทธิมนุษยชนและหลักนิติธรรม</option>
-              <option>ดัชนีสถาบัน</option>
-              <option>ดัชนีเสถียรภาพทางการเมือง</option>
-              <option>ดัชนีการมีสิทธิ์มีเสียงของประชาชนและภาระรับผิดชอบ</option>
-              <option>ดัชนีความปลอดภัยจากภัยคุกคาม</option>
-              <option>ดัชนีความสงบสุขภาคใต้</option>
               <option>
-                ประสิทธิภาพของหน่วยงานด้านการข่าวและประชาคมข่าวกรอง
-              </option>
-              <option>ดัชนีความแข็งแกร่งทางกำลังทหาร</option>
-              <option>ดัชนีรัฐเปราะบาง</option>
-              <option>
-                สถานการณ์บรรลุเป้าหมายของการพัฒนาที่ยั่งยืน (SDGs) เป้าหมายที่
-                17
+                อัตราการขยายตัวของผลิตภัณฑ์มวลรวมในประเทศสาขาเกษตร(ผลิตภัณฑ์มวลรวมในประเทศในสาขาเกษตรเพิ่มขึ้น)
               </option>
               <option>
-                ระดับประสิทธิภาพการดำเนินงานของหน่วยงานด้านการจัดการความมั่นคง
+                อัตราผลิตภาพการผลิตของภาคเกษตร(ผลิตภาพการผลิตของภาคเกษตรเพิ่มขึ้น)
+              </option>
+              <option>
+                อัตราการขยายตัวของมูลค่าของสินค้าเกษตรอัตลักษณ์พื้นถิ่น(สินค้าเกษตรอัตลักษณ์พื้นถิ่นมีมูลค่าเพิ่มขึ้น)
+              </option>
+              <option>
+                อัตราการขยายตัวของมูลค่าของสินค้าเกษตรปลอดภัยที่ได้รับการรับรอง
+              </option>
+              <option>
+                การจัดอันดับดัชนีคุณภาพและความปลอดภัยภายใต้ดัชนีความมั่นคงทางอาหาร(ผลิตภัณฑ์เกษตรปลอดภัยของไทยได้รับการยอมรับด้านคุณภาพความปลอดภัย)
+                และคุณค่าทางโภชนาการสูงขึ้น
+              </option>
+              <option>
+                อัตราการขยายตัวของมูลค่าสินค้าเกษตรชีวภาพ(สินค้าเกษตรชีวภาพมีมูลค่าเพิ่มขึ้น)
+              </option>
+              <option>
+                การจดทะเบียนดำเนินการของวิสาหกิจชุมชนที่เกี่ยวกับเกษตรชีวภาพ(วิสาหกิจการเกษตรจากฐานชีวภาพและภูมิปัญญาท้องถิ่นมีการจัดตั้งในทุกตำบลเพิ่มขึ้น)
+              </option>
+              <option>
+                การจดทะเบียนดำเนินการของวิสาหกิจชุมชนที่เกี่ยวกับเกษตรชีวภาพ(วิสาหกิจการเกษตรจากฐานชีวภาพและภูมิปัญญาท้องถิ่นมีการจัดตั้งในทุกตำบลเพิ่มขึ้น)
+              </option>
+              <option>
+                มูลค่าสินค้าที่มีการใช้เทคโนโลยีสมัยใหม่/อัจฉริยะ(สินค้าที่ได้จากเทคโนโลยีสมัยใหม่/อัจฉริยะมีมูลค่าเพิ่มขึ้น)
+              </option>
+              <option>
+                ผลผลิตต่อหน่วยของฟาร์มหรือแปลงที่มีการใช้เทคโนโลยีสมัยใหม่/อัจฉริยะ(ผลผลิตต่อหน่วยของฟาร์มหรือแปลงที่มีการใช้เทคโนโลยีสมัยใหม่/อัจฉริยะเพิ่มขึ้น)
+              </option>
+              <option>
+                ผลผลิตสินค้าเกษตรต่อหน่วย(ประสิทธิภาพการผลิตสินค้าเกษตรต่อหน่วยมีการปรับตัวเพิ่มขึ้น)
+              </option>
+              <option>
+                สถาบันเกษตรกร(สหกรณ์,วิสาหกิจชุมชน,และกลุ่มเกษตรกร)ที่ขึ้นทะเบียนกับกระทรวงเกษตรและสหกรณ์มีความเข้มแข็งในระดับมาตรฐาน
               </option>
             </select>
           </div>
@@ -310,6 +357,32 @@ const FormProduct = () => {
           </button>
         </div>
       </form>
+      <div
+        style={{
+          margin: "auto",
+          padding: "15px",
+          maxWidth: "600px",
+          alignContent: "center",
+        }}
+        className="d-flex input-group w-auto"
+      >
+        <input
+          type="text"
+          name="name"
+          className="form-control mr-4"
+          placeholder="Search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+
+        <button
+          type="submit"
+          color="dark"
+          className="btn btn-success rounded-3 bg-success text-white"
+        >
+          <SearchIcon />
+        </button>
+      </div>
 
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg pt-4">
         <table className="w-full text-sm text-left text-gray-800 dark:text-gray-400">
@@ -406,101 +479,130 @@ const FormProduct = () => {
           </thead>
           <tbody>
             {data
-              ? data.map((item, index) => (
-                  <tr
-                    key={index}
-                    className="bg-white border-b dark:bg-gray-900 dark:border-gray-700"
-                  >
-                    <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                      <button className="btn btn-primary mx-3">
-                        <Link to={"/edit/" + item._id}>
-                          <EditIcon />
-                        </Link>
-                      </button>
-                      <button
-                        className="btn btn-danger"
-                        onClick={() => {
-                          window.confirm(
-                            "คุณแน่ใจใช่ไหมว่าจะลบข้อมูลนี้ออกจากระบบ (Are you sure you want to delete your data?)"
-                          ) && handleRemove(item._id);
-                        }}
+              ? data
+                  .filter(
+                    (data) =>
+                      data.strategy.toLowerCase().includes(query) ||
+                      data.implementation.toLowerCase().includes(query)
+                  )
+                  .map((item, index) => (
+                    <tr
+                      key={index}
+                      className="bg-white border-b dark:bg-gray-900 dark:border-gray-700"
+                    >
+                      <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                        <button className="btn btn-primary mx-3">
+                          <Link to={"/edit/" + item._id}>
+                            <EditIcon />
+                          </Link>
+                        </button>
+                        <button
+                          className="btn btn-danger"
+                          onClick={() => {
+                            window.confirm(
+                              "คุณแน่ใจใช่ไหมว่าจะลบข้อมูลนี้ออกจากระบบ (Are you sure you want to delete your data?)"
+                            ) && handleRemove(item._id);
+                          }}
+                        >
+                          <DeleteIcon />
+                        </button>
+                      </td>
+                      <th
+                        scope="row"
+                        className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white"
                       >
-                        <DeleteIcon />
-                      </button>
-                    </td>
-                    <th
-                      scope="row"
-                      className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white"
-                    >
-                      {index + 1}
-                    </th>
-                    <th
-                      scope="row"
-                      className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white"
-                    >
-                      {item.strategy}
-                    </th>
-                    <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                      {item.implementation}
-                    </td>
-                    <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                      {item.email}
-                    </td>
-                    <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                      {item.mobile}
-                    </td>
-                    <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                      {item.budget}
-                    </td>
-                    <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                      {item.year}
-                    </td>
-                    <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                      {item.evaluation}
-                    </td>
-                    <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                      {item.strength}
-                    </td>
-                    <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                      {item.weak}
-                    </td>
-                    <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                      {item.development}
-                    </td>
-                    <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                      {item.improvement}
-                    </td>
-                    <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                      {item.suggestion}
-                    </td>
-                    <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                      {/* <Link
+                        {index + 1}
+                      </th>
+                      <th
+                        scope="row"
+                        className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white"
+                      >
+                        {item.strategy}
+                      </th>
+                      <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                        {item.implementation}
+                      </td>
+                      <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                        {item.email}
+                      </td>
+                      <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                        {item.mobile}
+                      </td>
+                      <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                        {item.budget}
+                      </td>
+                      <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                        {item.year}
+                      </td>
+                      <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                        {item.evaluation}
+                      </td>
+                      <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                        {item.strength}
+                      </td>
+                      <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                        {item.weak}
+                      </td>
+                      <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                        {item.development}
+                      </td>
+                      <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                        {item.improvement}
+                      </td>
+                      <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                        {item.suggestion}
+                      </td>
+                      <td className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                        {/* <Link
                         to={"/edit/" + item._id}
                         className="font-medium text-blue-600 dark:text-blue-500 hover:underline mx-4"
                       >
                        <EditIcon />
                       </Link> */}
-                      <button className="btn btn-primary mx-3">
-                        <Link to={"/edit/" + item._id}>
-                          <EditIcon />
-                        </Link>
-                      </button>
-                      <button 
-                        className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                        onClick={() => {
-                          window.confirm(
-                            "คุณแน่ใจใช่ไหมว่าจะลบข้อมูลนี้ออกจากระบบ (Are you sure you want to delete your data?)"
-                          ) && handleRemove(item._id);
-                        }}
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))
+                        <button className="btn btn-primary mx-3">
+                          <Link to={"/edit/" + item._id}>
+                            <EditIcon />
+                          </Link>
+                        </button>
+                        <button
+                          className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                          onClick={() => {
+                            window.confirm(
+                              "คุณแน่ใจใช่ไหมว่าจะลบข้อมูลนี้ออกจากระบบ (Are you sure you want to delete your data?)"
+                            ) && handleRemove(item._id);
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))
               : null}
           </tbody>
         </table>
+      </div>
+      <div className="mt-10">
+        <ReactPaginate
+          breakLabel="..."
+          nextLabel="Next >"
+          onPageChange={handlePageClick}
+          pageCount={pageCount}
+          previousLabel="< Previous"
+          renderOnZeroPageCount={null}
+          marginPagesDisplayed={3}
+          pageRangeDisplayed={6}
+          containerClassName="pagination justify-content-center"
+          pageClassName="page-item"
+          pageLinkClassName="page-link"
+          previousClassName="page-item"
+          previousLinkClassName="page-link"
+          nextClassName="page-item"
+          nextLinkClassName="page-link"
+          activeClassName="active"
+          forcePage={currentPage.current - 1}
+          breakClassName={"page-item"}
+          breakLinkClassName={"page-link"}
+        />
       </div>
     </div>
   );
